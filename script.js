@@ -181,7 +181,89 @@ function setDateInputMin() {
 
 function updateSummary() {
   const summaryText = document.getElementById('summary-text');
-  summaryText.textContent = `Hi ${responseData.name}! You were born on ${responseData.birthday}, you love ${responseData.colour}, would love to visit ${responseData.place}, and want to enjoy ${responseData.food} together. Would you like to go on a date?`;
+  summaryText.textContent = `Hi ${responseData.name}! You were born on ${responseData.birthday}, you love ${responseData.colour}, would love to visit ${responseData.place}, and want to enjoy ${re[...]
+}
+
+function formatDateToReadable(dateString) {
+  const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' };
+  return new Date().toLocaleDateString('en-US', options);
+}
+
+function generateResponseTextFile(data) {
+  const timestamp = new Date();
+  const readableDate = timestamp.toLocaleDateString('en-US', { 
+    weekday: 'long', 
+    year: 'numeric', 
+    month: 'long', 
+    day: 'numeric', 
+    hour: '2-digit', 
+    minute: '2-digit', 
+    second: '2-digit' 
+  });
+  const isoDate = timestamp.toISOString();
+
+  const content = `╔════════════════════════════════════════════════════════════╗
+║         PROPOSAL RESPONSE SUMMARY                          ║
+╚════════════════════════════════════════════════════════════╝
+
+📋 TIMESTAMP
+─────────────────────────────────────────────────────────────
+Generated: ${readableDate}
+ISO Format: ${isoDate}
+
+👤 USER RESPONSES
+─────────────────────────────────────────────────────────────
+🍫 Favorite Dessert: ${data.dessert}
+🌸 Favorite Flower: ${data.flower}
+🎨 Favorite Color: ${data.colour}
+📍 Favorite Place: ${data.place}
+🍽️ Favorite Meal: ${data.food}
+
+💌 PROPOSAL DETAILS
+─────────────────────────────────────────────────────────────
+📅 Proposed Date: ${data.date || 'Not set'}
+✅ Response Status: PENDING
+
+📊 METADATA
+─────────────────────────────────────────────────────────────
+Created At: ${data.createdAt || 'Not set'}
+File Version: 1.0
+
+╚════════════════════════════════════════════════════════════╝`;
+
+  return content;
+}
+
+function downloadTextFile(content, filename) {
+  const blob = new Blob([content], { type: 'text/plain' });
+  const url = window.URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  window.URL.revokeObjectURL(url);
+}
+
+function generateAndDownloadResponseFile() {
+  try {
+    const content = generateResponseTextFile(responseData);
+    const timestamp = new Date();
+    const yyyy = timestamp.getFullYear();
+    const mm = String(timestamp.getMonth() + 1).padStart(2, '0');
+    const dd = String(timestamp.getDate()).padStart(2, '0');
+    const hh = String(timestamp.getHours()).padStart(2, '0');
+    const min = String(timestamp.getMinutes()).padStart(2, '0');
+    const ss = String(timestamp.getSeconds()).padStart(2, '0');
+    const filename = `proposal-response_${yyyy}-${mm}-${dd}_${hh}-${min}-${ss}.txt`;
+    
+    downloadTextFile(content, filename);
+    showFeedback('date-feedback', '📥 Response file downloaded!', '#22c55e');
+  } catch (error) {
+    console.error('Error generating file:', error);
+    showFeedback('date-feedback', '⚠️ Could not generate file', '#e9618a');
+  }
 }
 
 function handleDateChange() {
@@ -192,6 +274,7 @@ function handleDateChange() {
   if (responseData.date) {
     confirmBtn.disabled = false;
     showFeedback('date-feedback', 'Great! Picked a date from today onward.', '#22c55e');
+    generateAndDownloadResponseFile();
   } else {
     confirmBtn.disabled = true;
     showFeedback('date-feedback', '', '');
