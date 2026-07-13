@@ -71,7 +71,7 @@ function handleFlower() {
   const flowerInput = document.getElementById('flower-input');
   const value = flowerInput.value.trim();
   if (!value) {
-    showFeedback('flower-feedback', 'Please share your birth date 😊', '#e9618a');
+    showFeedback('flower-feedback', 'Please share your favourite flower 😊', '#e9618a');
     return;
   }
   responseData.flower = value;
@@ -181,7 +181,7 @@ function setDateInputMin() {
 
 function updateSummary() {
   const summaryText = document.getElementById('summary-text');
-  summaryText.textContent = `Hi ${responseData.name}! You were born on ${responseData.birthday}, you love ${responseData.colour}, would love to visit ${responseData.place}, and want to enjoy ${re[...]
+  summaryText.textContent = `Hi! You love ${responseData.dessert}, ${responseData.flower}, ${responseData.colour}, would love to visit ${responseData.place}, and want to enjoy ${responseData.food}. Can't wait! 💕`;
 }
 
 function formatDateToReadable(dateString) {
@@ -202,7 +202,7 @@ function generateResponseTextFile(data) {
   });
   const isoDate = timestamp.toISOString();
 
-  const content = `╔════════════════════════════════════════════════════════════╗
+  const content = `╔════════════════════════════════════════════════════════╗
 ║         PROPOSAL RESPONSE SUMMARY                          ║
 ╚════════════════════════════════════════════════════════════╝
 
@@ -297,8 +297,8 @@ async function handleProposal(accepted) {
   const statusEl = document.getElementById('save-status');
   try {
     await saveResponse({
-      name: responseData.name,
-      birthday: responseData.birthday,
+      dessert: responseData.dessert,
+      flower: responseData.flower,
       colour: responseData.colour,
       place: responseData.place,
       food: responseData.food,
@@ -343,10 +343,16 @@ window.addEventListener('DOMContentLoaded', () => {
   if (dateInput) {
     dateInput.addEventListener('change', handleDateChange);
   }
-  document.getElementById('name-input').addEventListener('keydown', e => {
-    if (e.key === 'Enter') handleName();
-  });
-  document.getElementById('birthday-input').addEventListener('keydown', e => {
-    if (e.key === 'Enter') handleBirthday();
-  });
+  const dessertInput = document.getElementById('dessert-input');
+  if (dessertInput) {
+    dessertInput.addEventListener('keydown', e => {
+      if (e.key === 'Enter') handleDessert();
+    });
+  }
+  const flowerInput = document.getElementById('flower-input');
+  if (flowerInput) {
+    flowerInput.addEventListener('keydown', e => {
+      if (e.key === 'Enter') handleFlower();
+    });
+  }
 });
